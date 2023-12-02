@@ -3,6 +3,7 @@ from constants import ReadyStatus, Choices, Outcomes
 from time import sleep
 # from ocr import Camera
 from nlp import NLP, TTS
+from image_handler import ImageHandler
 
 
 class RPS:
@@ -12,12 +13,17 @@ class RPS:
         self.ready = ReadyStatus.NOT_READY
         self.tts = TTS()
         self.nlp = NLP()
+        self.img_handler = ImageHandler()
         self.human_player = Player(nlp=self.nlp, tts=self.tts)
         self.computer_player = Player(name="Agent", nlp=self.nlp, tts=self.tts)
 
     def initial_setup(self):
+        self.img_handler.load_image(file_path="images/GERTY_happy.png")
+        self.img_handler.display_image()
         self.tts.speak(text="Welcome to Rock Paper Scissors Companion!")
         self.human_player.get_player_name()
+        self.img_handler.load_image(file_path="images/GERTY_excited.png")
+        self.img_handler.display_image()
 
     def play_round(self):
         self.new_round_setup()
