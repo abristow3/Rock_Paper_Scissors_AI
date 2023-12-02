@@ -18,12 +18,11 @@ class RPS:
         self.computer_player = Player(name="Agent", nlp=self.nlp, tts=self.tts)
 
     def initial_setup(self):
-        self.img_handler.load_image(file_path="images/GERTY_happy.png")
-        self.img_handler.display_image()
+        self.img_handler.display_image(file_path="images/GERTY_happy.png")
         self.tts.speak(text="Welcome to Rock Paper Scissors Companion!")
+
+        self.img_handler.display_image(file_path="images/GERTY_indifferent.png")
         self.human_player.get_player_name()
-        self.img_handler.load_image(file_path="images/GERTY_excited.png")
-        self.img_handler.display_image()
 
     def play_round(self):
         self.new_round_setup()
@@ -39,16 +38,19 @@ class RPS:
 
     def get_ready_status(self):
         while self.ready == ReadyStatus.NOT_READY:
+            self.img_handler.display_image(file_path="images/GERTY_excited.png")
             self.tts.speak(text="Are you ready to play? Answer yes or no.")
             selection = self.nlp.listen_for_speech()
 
             if "yes" in selection:
                 self.ready = ReadyStatus.READY
             elif "no" in selection:
+                self.img_handler.display_image(file_path="images/GERTY_sad.png")
                 self.ready = ReadyStatus.NOT_READY
                 print("Waiting 3 seconds and trying again.\n")
                 sleep(3)
             elif "yes" not in selection or "no" not in selection:
+                self.img_handler.display_image(file_path="images/GERTY_confused.png")
                 self.ready = ReadyStatus.NOT_READY
                 self.tts.speak(text=f"Invalid choice: {selection}. Please say yes or no.")
 
@@ -57,6 +59,7 @@ class RPS:
         self.tts.speak(text=f"{self.computer_player.name} chose: {self.computer_player.choice}")
 
         if self.human_player.choice == self.computer_player.choice:
+            self.img_handler.display_image(file_path="images/GERTY_surprised.png")
             self.tts.speak("The outcome is a DRAW!")
             self.human_player.outcome = Outcomes.DRAW
             self.computer_player.outcome = Outcomes.DRAW
@@ -65,11 +68,13 @@ class RPS:
                 (self.human_player.choice == Choices.PAPER and self.computer_player.choice == Choices.SCISSORS) or \
                 (self.human_player.choice == Choices.SCISSORS and self.computer_player.choice == Choices.ROCK):
 
+            self.img_handler.display_image(file_path="images/GERTY_good_news.png")
             self.tts.speak(text=f"{self.human_player.name} LOSES!")
             self.human_player.outcome = Outcomes.LOSE
             self.computer_player.outcome = Outcomes.WIN
 
         else:
+            self.img_handler.display_image(file_path="images/GERTY_surprised.png")
             self.tts.speak(text=f"{self.human_player.name} WINS!")
             self.human_player.outcome = Outcomes.WIN
             self.computer_player.outcome = Outcomes.LOSE
@@ -93,18 +98,22 @@ class RPS:
         valid_choice = False
 
         while not valid_choice:
+            self.img_handler.display_image(file_path="images/GERTY_thinking_left.png")
             self.tts.speak(text="Would you like to play again? Say yes or no.")
             play = self.nlp.listen_for_speech()
 
             if "yes" in play:
+                self.img_handler.display_image(file_path="images/GERTY_excited.png")
                 self.tts.speak(text="Playing again!")
                 self.play_again = True
                 valid_choice = True
             elif "no" in play:
+                self.img_handler.display_image(file_path="images/GERTY_sad.png")
                 self.tts.speak(text="Ending the game, goodbye.")
                 self.play_again = False
                 valid_choice = True
             else:
+                self.img_handler.display_image(file_path="images/GERTY_confused.png")
                 self.tts.speak(text="Invalid choice.")
                 valid_choice = False
 
