@@ -17,7 +17,6 @@ class RPS:
 
     def initial_setup(self):
         self.tts.speak(text="Welcome to Rock Paper Scissors Companion!")
-        # print("=== Welcome to Rock Paper Scissors Companion!===\n")
         self.human_player.get_player_name()
 
     def play_round(self):
@@ -41,18 +40,18 @@ class RPS:
                 self.ready = ReadyStatus.READY
             elif "no" in selection:
                 self.ready = ReadyStatus.NOT_READY
-                print("Waiting 5 seconds and trying again.\n")
-                sleep(5)
+                print("Waiting 3 seconds and trying again.\n")
+                sleep(3)
             elif "yes" not in selection or "no" not in selection:
                 self.ready = ReadyStatus.NOT_READY
                 self.tts.speak(text=f"Invalid choice: {selection}. Please say yes or no.")
 
     def determine_outcome(self):
-        print(f"{self.human_player.name} chose: {self.human_player.choice}."
-              f"{self.computer_player.name} chose: {self.computer_player.choice}")
+        self.tts.speak(text=f"{self.human_player.name} chose: {self.human_player.choice}.")
+        self.tts.speak(text=f"{self.computer_player.name} chose: {self.computer_player.choice}")
 
         if self.human_player.choice == self.computer_player.choice:
-            print("The outcome is a DRAW!\n")
+            self.tts.speak("The outcome is a DRAW!")
             self.human_player.outcome = Outcomes.DRAW
             self.computer_player.outcome = Outcomes.DRAW
 
@@ -60,12 +59,12 @@ class RPS:
                 (self.human_player.choice == Choices.PAPER and self.computer_player.choice == Choices.SCISSORS) or \
                 (self.human_player.choice == Choices.SCISSORS and self.computer_player.choice == Choices.ROCK):
 
-            print(f"{self.human_player.name} LOSES!\n")
+            self.tts.speak(text=f"{self.human_player.name} LOSES!")
             self.human_player.outcome = Outcomes.LOSE
             self.computer_player.outcome = Outcomes.WIN
 
         else:
-            print(f"{self.human_player.name} WINS!\n")
+            self.tts.speak(text=f"{self.human_player.name} WINS!")
             self.human_player.outcome = Outcomes.WIN
             self.computer_player.outcome = Outcomes.LOSE
 
@@ -78,9 +77,8 @@ class RPS:
         self.computer_player.select_move()
 
     def display_scores(self):
-        print(f"The score is:\n"
-              f"{self.human_player.name}: {self.human_player.score}\n"
-              f"{self.computer_player.name}: {self.computer_player.score}\n")
+        self.tts.speak(
+            text=f"The score is {self.human_player.name}, {self.human_player.score}, {self.computer_player.name}, {self.computer_player.score}")
 
     def update_round_number(self):
         self.round_num += 1
@@ -89,18 +87,20 @@ class RPS:
         valid_choice = False
 
         while not valid_choice:
-            play = int(input("Would you like to play again? (1)Yes (0)No"))
+            self.tts.speak(text="Would you like to play again? Say yes or no.")
+            play = self.nlp.listen_for_speech()
 
-            if play < 0 or play > 1:
-                print("Invalid choice please choose 0 or 1.\n")
-                valid_choice = False
-            elif play == 0:
-                print("GOOD BYE!")
-                self.play_again = False
-                valid_choice = True
-            elif play == 1:
+            if "yes" in play:
+                self.tts.speak(text="Playing again!")
                 self.play_again = True
                 valid_choice = True
+            elif "no" in play:
+                self.tts.speak(text="Ending the game, goodbye.")
+                self.play_again = False
+                valid_choice = True
+            else:
+                self.tts.speak(text="Invalid choice.")
+                valid_choice = False
 
     def new_round_setup(self):
         self.ready = ReadyStatus.NOT_READY

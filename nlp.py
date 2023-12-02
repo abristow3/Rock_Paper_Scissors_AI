@@ -1,10 +1,3 @@
-'''
-takes in a prompt and converts text to speech
-listens for player voice input after question prompt using speech recognition
-ambient background dampening
-wait for trigger word to listen for player audio command
-'''
-
 import speech_recognition as sr
 import pyttsx3 as tts
 

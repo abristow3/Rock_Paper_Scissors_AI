@@ -4,9 +4,6 @@ import random
 
 
 class Player:
-    '''
-
-    '''
 
     def __init__(self, nlp, tts, name: str = None):
         self.name = name
@@ -55,10 +52,6 @@ class Player:
                 self.tts.speak(text="Please choose Rock, Paper, or Scissors.")
                 selection = self.nlp.listen_for_speech()
 
-                # selection = int(input(f"{self.name} please make a selection:\n"
-                #                       "(0) Rock\n"
-                #                       "(1) Paper\n"
-                #                       "(2) Scissors\n"))
                 if "rock" in selection:
                     self.tts.speak(text=f"Your choice was rock")
 
@@ -80,14 +73,6 @@ class Player:
                 else:
                     self.tts.speak(text=f"Invalid choice. You said {selection}.")
                     valid_selection = False
-
-                # if selection < 0 or selection > 2:
-                #     print(f"Invalid choice: {selection}. Please choose between 1 and 3.\n")
-                #     valid_selection = False
-                # else:
-                #     self.choice = Choices(selection)
-                #     print(f"Your Choice: {self.choice}\n")
-                #     valid_selection = True
 
     def update_score(self):
         if self.outcome == Outcomes.WIN:
