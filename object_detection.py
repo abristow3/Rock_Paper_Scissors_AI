@@ -7,7 +7,6 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import shutil
-
 import cv2
 import time
 from heic2png import HEIC2PNG
