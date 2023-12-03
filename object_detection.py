@@ -1,15 +1,10 @@
 import tensorflow as tf
 from keras.preprocessing.image import ImageDataGenerator
 from keras.preprocessing import image
-import matplotlib.image as mpimg
-import pandas as pd
 import numpy as np
-import os
-import matplotlib.pyplot as plt
 import shutil
 import cv2
 import time
-from heic2png import HEIC2PNG
 
 
 class ObjectDetection:
@@ -21,8 +16,6 @@ class ObjectDetection:
         if load_model:
             self.model = tf.keras.models.load_model('green_model.h5')
         else:
-            # self.training_data = "assets/new_dataset/Rock-Paper-Scissors/train"
-
             self.generator = ImageDataGenerator(
                 rescale=1 / 255.0,
                 zoom_range=0.25,
@@ -74,7 +67,7 @@ class ObjectDetection:
                                optimizer=tf.keras.optimizers.legacy.Adam(),
                                metrics=['accuracy'])
 
-            self.model.fit(
+            historyModel = self.model.fit(
                 self.training_generator,
                 epochs=20,
                 validation_data=self.validation_generator,
@@ -131,31 +124,3 @@ class Camera:
 
         self.cap.release()
         cv2.destroyAllWindows()
-
-
-if __name__ == '__main__':
-    camera = Camera()
-    camera.capture_image()
-
-    # od = ObjectDetection(load_model=True)
-    # od.model_predict(uploaded="scissors.png")
-    # print(od.prediction)
-
-    # od = ObjectDetection(load_model=True)
-    # od.model_predict(uploaded='rock.png')
-
-    # dir_list = os.listdir("hand_images")
-    #
-    # for file in dir_list:
-    #     heic_img = HEIC2PNG(f"hand_images/{file}")
-    #
-    #     file_name = file.replace(".HEIC", "")
-    #
-    #     heic_img.save(output_image_file_path=f"converted_images/{file_name}.png")
-
-    # dir_list = os.listdir("converted_images")
-    #
-    # for file in dir_list:
-    #     img = cv2.imread(f"scissors.png")
-    #     img = cv2.resize(img, (180, 180))
-    #     cv2.imwrite(f"scissors.png", img)

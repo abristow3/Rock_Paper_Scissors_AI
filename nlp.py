@@ -1,5 +1,6 @@
 import speech_recognition as sr
 import pyttsx3 as tts
+import sounddevice
 
 
 class NLP:
@@ -31,3 +32,14 @@ class TTS:
     def speak(self, text: str):
         self.engine.say(text)
         self.engine.runAndWait()
+
+
+if __name__ == '__main__':
+
+    sr.Microphone.list_microphone_names()
+    nlp = NLP()
+    tts = TTS()
+
+    tts.speak(text="Hello this is a test. Please speak now")
+    audio = nlp.listen_for_speech()
+    tts.speak(text=f"you said {audio}")
