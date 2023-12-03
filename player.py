@@ -1,17 +1,20 @@
 from constants import Choices, Outcomes
 import random
-# from ocr import Camera
+from object_detection import Camera
+import time
 
 
 class Player:
 
-    def __init__(self, nlp, tts, name: str = None):
+    def __init__(self, nlp, tts, od, name: str = None):
         self.name = name
         self.choice = None
         self.score = 0
         self.outcome = None
         self.nlp = nlp
         self.tts = tts
+        self.od = od
+        self.camera = Camera()
 
     def get_player_name(self):
         correct_name = False
@@ -33,46 +36,57 @@ class Player:
 
     def select_move(self):
         if self.name == "Agent":
-            # Select move at random for computer player
             self.choice = Choices(random.choice(list(Choices)))
             print(f"AGENT CHOICE: {self.choice}")
         else:
             valid_selection = False
-            # camera = Camera()
-            #
-            # print("Please make a selection with your hand and press 'q' when ready to take a picture")
-            # camera.capture_video()
-
-            # CV To detect player choice from image goes here
-            # selection = ocr.prediction()
-            # self.choice = Choices(selection)
-            # print(f"Your Choice: {self.choice}\n")
 
             while not valid_selection:
                 self.tts.speak(text="Please choose Rock, Paper, or Scissors.")
+
+                self.tts.speak(text="The camera is on, please place your hand in the frame with your move.")
+                time.sleep(2)
+
+                self.tts.speak(text="Taking picture in 3 seconds.")
+                self.camera.capture_image()
+
+                self.tts.speak(text="Picture taken. Predicting player choice.")
+                self.od.model_predict(uploaded='player_images/player_choice.png')
+
+                self.tts.speak(text=f"Did you choose {self.od.prediction}? Yes or No?")
                 selection = self.nlp.listen_for_speech()
 
-                if "rock" in selection:
-                    self.tts.speak(text=f"Your choice was rock")
+                if "no" in selection:
+                    while True:
+                        self.tts.speak(text="What was your selection?")
+                        selection = self.nlp.listen_for_speech()
 
-                    selection = 0
-                    self.choice = Choices(selection)
-                    valid_selection = True
-                elif "paper" in selection:
-                    self.tts.speak(text=f"Your choice was paper")
+                        file_path = "player_images/player_choice.png"
 
-                    selection = 1
-                    self.choice = Choices(selection)
-                    valid_selection = True
-                elif "scissors" in selection:
-                    self.tts.speak(text=f"Your choice was scissors")
+                        if "rock" in selection:
+                            self.choice = Choices.ROCK
+                            self.od.label_and_save(file_path=file_path, label="rock")
+                            break
+                        elif "paper" in selection:
+                            self.choice = Choices.PAPER
+                            self.od.label_and_save(file_path=file_path, label="paper")
+                            break
+                        elif "scissors" in selection:
+                            self.choice = Choices.SCISSORS
+                            self.od.label_and_save(file_path=file_path, label="scissors")
+                            break
+                        else:
+                            self.tts.speak(text="I didn't understand.")
 
-                    selection = 2
-                    self.choice = Choices(selection)
-                    valid_selection = True
                 else:
-                    self.tts.speak(text=f"Invalid choice. You said {selection}.")
-                    valid_selection = False
+                    if "rock" in self.od.prediction:
+                        self.choice = Choices.ROCK
+                    elif "paper" in self.od.prediction:
+                        self.choice = Choices.PAPER
+                    else:
+                        self.choice = Choices.SCISSORS
+
+                valid_selection = True
 
     def update_score(self):
         if self.outcome == Outcomes.WIN:
